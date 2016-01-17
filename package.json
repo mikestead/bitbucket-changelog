@@ -1,0 +1,51 @@
+{
+  "name": "bitbucket-changelog",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [
+    "stash",
+    "atlassian",
+    "jira",
+    "git",
+    "changelog",
+    "release"
+  ],
+  "author": {
+    "name": "Mike Stead",
+    "url": "https://github.com/mikestead"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/mikestead/bitbucket-changelog",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mikestead/bitbucket-changelog.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mikestead/bitbucket-changelog/issues"
+  },
+  "engines": {
+    "node": ">=4.0.0",
+    "npm": ">=2.14.2"
+  },
+  "scripts": {
+    "lint": "eslint index.js",
+    "test": "mocha --recursive"
+  },
+  "bin": {
+    "gen-changelog": "index.js"
+  },
+  "dependencies": {
+    "axios": "^0.8.1",
+    "co": "^4.6.0",
+    "co-prompt": "^1.0.0",
+    "commander": "^2.9.0",
+    "lil-uri": "^0.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^1.10.3",
+    "eslint-config-rackt": "^1.1.1",
+    "expect": "^1.13.0",
+    "express": "^4.13.3",
+    "mocha": "^2.3.4"
+  }
+}
