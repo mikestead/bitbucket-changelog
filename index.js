@@ -171,7 +171,12 @@ function *buildReleases() {
 		if (!lastTag || (pr.updatedDate > lastTag.commit.authorTimestamp)) {
 			release.prs.push(pr)
 		} else {
-			releases.push(release)
+			// If this version is same as last version then must be generating
+			// full changelog, and not as part of new release, so discard any
+			// new merges as no new release for them to go with.
+			if (!lastTag || lastTag.displayId !== release.version) {
+				releases.push(release)
+			}
 			release = {prs: [pr]}
 			if (lastTag) release.version = lastTag.displayId
 			lastTag = tags.shift()

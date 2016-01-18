@@ -1,12 +1,12 @@
 # Bitbucket Changelog
 
-##### Currently supported Bitbucket Server, _not Cloud_.
+##### Currently supports Bitbucket Server, _not Cloud_.
 
 Maintain a changelog of merged pull requests to master branch since 
 the last release. Can be integrated into your automated release cycle.
 
 Includes child pull requests from those that went into master, so if you
-run feature branches which have story/fix branches of them, these will be listed too.
+run feature branches which have story/fix branches off them, these will be listed too.
 
 ### Installation
 
