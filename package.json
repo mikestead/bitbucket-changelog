@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "keywords": [
+    "bitbucket",
     "stash",
-    "atlassian",
     "jira",
+    "atlassian",
     "git",
     "changelog",
     "release"
@@ -32,7 +33,7 @@
     "test": "mocha --recursive"
   },
   "bin": {
-    "gen-changelog": "index.js"
+    "bbgenlog": "index.js"
   },
   "dependencies": {
     "axios": "^0.8.1",

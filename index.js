@@ -17,8 +17,8 @@ const JIRA_REGEX = /(?:)([A-Z]{1,}-[0-9]+)(?=\s|_|$)/g
 let settings
 
 program
-	.option('-o, --overwrite', 'Regenerate the full changelog. This will overwrite the current changelog')
-	.option('-i, --interactive', 'Request username / password if not provided')
+	.option('-o, --overwrite', 'regenerate the full changelog. OVERWRITES the current changelog')
+	.option('-i, --interactive', 'request username / password if not provided')
 	.parse(process.argv)
 
 co(function *() {
