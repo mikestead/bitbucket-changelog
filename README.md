@@ -16,6 +16,10 @@ run feature branches which have story/fix branches off them, these will be liste
 
 __Requires Node 4+__
 
+You can pass your credentials via env variables
+
+	BITBUCKET_USER=username BITBUCKET_PSWD=password bbgenlog
+
 This command should be run _after_ a version bump has been made to the `package.json`
 but _before_ you tag your release.
 
@@ -36,9 +40,6 @@ You should also add some some configuration to your `package.json` as shown belo
         }
     }
 
-When running you can pass your credentials via env variables
-
-	BITBUCKET_USER=username BITBUCKET_PSWD=password bbgenlog
 	
 By default this will only generate and add the pull requests merged since your last release.
 
@@ -46,7 +47,7 @@ If you want to generate the entire changelog add the `--overwrite` parameter.
 
 	BITBUCKET_USER=username BITBUCKET_PSWD=password bbgenlog --overwrite
 
-_Remember this will remove any manual edits you've previously made._
+_Remember this will overwrite the entire contents of the file._
 
 If running yourself you can launch in interactive mode, which will prompt for credentials.
 

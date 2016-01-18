@@ -8,11 +8,12 @@ const fs = require('fs')
 const program = require('commander')
 const prompt = require('co-prompt')
 const co = require('co')
+const moment = require('moment')
 const chalk = require('chalk')
 const assert = require('assert')
 
 const DEFAULT_FILE = 'CHANGES.md'
-const JIRA_REGEX = /(?:)([A-Z]{1,}-[0-9]+)(?=\s|_|$)/g
+const JIRA_REGEX = /(?:)([A-Z]{1,}-[0-9]+)(?=\s|_|\/|$)/g
 
 let settings
 
@@ -61,7 +62,7 @@ function verifySettings(settings) {
 	assert.ok(settings.bitbucket, 'Please define your bitbucket base url in package.json. See README for more info.')
 
 	if (!settings.overwrite) {
-		const releaseTitle = renderReleaseTitle({version: settings.version})
+		const releaseTitle = renderReleaseTitle({ version: settings.version })
 		const regex = new RegExp(`^${releaseTitle}$`, 'm')
 		const present = settings.fileContents.match(regex)
 		assert.ok(!present, `Release ${settings.version} was already found in changelog. Aborting.`)
@@ -79,16 +80,18 @@ function getRepoInfo() {
 		const parts = url.path().split('/')
 		const slug = path.basename(parts.pop(), '.git')
 		const key = parts.pop()
-		return {bitbucket: `https://${host}`, projectKey: key, slug}
+		return { bitbucket: `https://${host}`, projectKey: key, slug }
 	}
-	catch(e) { }
+	catch(e) {
+		// Failed to get details from git repo so we'll have to rely on package.json config
+	}
 	return {}
 }
 
 function getPackageInfo() {
 	try {
 		const pkg = require(path.resolve('./package.json'))
-		return Object.assign({version: pkg.version}, pkg.changelog)
+		return Object.assign({ version: pkg.version }, pkg.changelog)
 	}
 	catch(e) {
 		return {}
@@ -163,7 +166,7 @@ function *buildReleases() {
 	const childPrs = yield childPrPromises
 	prs.forEach((pr, i) => pr.children = childPrs[i])
 
-	let release = {version: settings.version, prs: []}
+	let release = { version: settings.version, prs: [], date: Date.now()}
 	let lastTag = tags.shift()
 	const releases = []
 	while (prs.length) {
@@ -177,8 +180,12 @@ function *buildReleases() {
 			if (!lastTag || lastTag.displayId !== release.version) {
 				releases.push(release)
 			}
-			release = {prs: [pr]}
-			if (lastTag) release.version = lastTag.displayId
+
+			release = { prs: [ pr ] }
+			if (lastTag) {
+				release.version = lastTag.displayId
+				release.date = lastTag.commit.authorTimestamp
+			}
 			lastTag = tags.shift()
 		}
 	}
@@ -198,6 +205,7 @@ function renderReleases(releases) {
 function renderRelease(r) {
 	let lines = []
 	lines.push(renderReleaseTitle(r))
+	lines.push(`${renderDate(r.date, 'MMM Do YY')}\n`)
 	lines = lines.concat(renderPrs(r.prs, 0))
 	lines.push('')
 	return lines
@@ -215,7 +223,9 @@ function renderPrs(prs, indent) {
 function renderPr(pr, indent) {
 	const space = ' '.repeat(indent)
 	let lines = []
-	lines.push(`${space}- ${renderPrLink(pr)} ${pr.title} <small>${renderAuthor(pr)}${renderJiras(pr)}</small>`)
+	let line = `${space}- ${renderPrLink(pr)} ${pr.title} `
+	line += `<small>${renderAuthor(pr)}${renderJiras(pr)} - ${renderDate(pr.updatedDate, 'D/M/YY')}</small>`
+	lines.push(line)
 	if (pr.children && pr.children.length) {
 		lines = lines.concat(renderPrs(pr.children, indent + 4))
 	}
@@ -230,12 +240,16 @@ function renderAuthor(pr) {
 	return `[${pr.author.user.displayName}](${pr.author.user.links.self[0].href})`
 }
 
+function renderDate(timestamp, format) {
+	return `${moment(timestamp).format(format)}`
+}
+
 function renderJiras(pr) {
 	const m1 = (pr.title || '').match(JIRA_REGEX)
 	const m2 = (pr.description || '').match(JIRA_REGEX)
 	const m3 = (pr.fromRef.displayId || '').match(JIRA_REGEX)
 	const comb = (m1 || []).concat(m2 ||[]).concat(m3 || [])
-	const jiras = [...new Set(comb)]
+	const jiras = [ ...new Set(comb) ]
 	if (jiras.length) {
 		if (settings.jira) {
 			return ` (${jiras.map(id => `[${id}](${settings.jira}/browse/${id})`).join(', ')})`
@@ -256,7 +270,7 @@ function write(file, contents) {
 	if (settings.overwrite || !fileStats) {
 		fs.writeFileSync(file, contents, 'utf8')
 	} else {
-		fs.writeFileSync(file, settings.fileContents + oldContents, 'utf8')
+		fs.writeFileSync(file, contents + settings.fileContents, 'utf8')
 	}
 }
 
@@ -270,16 +284,17 @@ function stats(file) {
 
 function complete() {
 	const filename = path.basename(settings.file)
-	const msg = `${settings.version} written to ${filename}`
-	console.log(chalk.bold.cyan(msg))
+	const msg = `${settings.version} written to ${filename}\n`
+	process.stdout.write(chalk.bold.cyan(msg))
+	process.exit(0)
 }
 
 function error(e) {
 	let msg
-	if (e.status) msg = `${res.status}: ${res.statusText} - ${res.data}`
+	if (e.status) msg = `${e.status}: ${e.statusText} - ${e.data}`
 	else if (e.message) msg = e.message
 	else msg = e
 
-	console.log(chalk.red(msg))
+	process.stdout.write(chalk.red(`${msg}\n`))
 	process.exist(1)
 }
