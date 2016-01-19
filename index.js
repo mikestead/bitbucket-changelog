@@ -54,6 +54,11 @@ function *getSettings(program) {
 
 	verifySettings(settings)
 
+	if (settings.verbose) {
+		print('Settings:')
+		print(JSON.stringify(settings, null, 2))
+	}
+
 	return settings
 }
 
@@ -139,7 +144,7 @@ function getCommit(hash) {
 }
 
 function serviceCall(url) {
-	if (settings.verbose) process.stdout.write(`${url}\n`)
+	if (settings.verbose) print(url)
 
 	return request({
 		url,
@@ -288,17 +293,21 @@ function stats(file) {
 
 function complete() {
 	const filename = path.basename(settings.file)
-	const msg = `${settings.version} written to ${filename}\n`
-	process.stdout.write(chalk.bold.cyan(msg))
+	const msg = `${settings.version} written to ${filename}`
+	print(chalk.bold.cyan(msg))
 	process.exit(0)
 }
 
 function error(e) {
 	let msg
-	if (e.status) msg = `${e.status}: ${e.statusText} - ${JSON.stringify(e.data)}`
+	if (e.status) msg = `${e.status}: ${e.statusText} - ${JSON.stringify(e.data, null, 2)}`
 	else if (e.message) msg = e.message
 	else msg = e
 
-	process.stdout.write(chalk.red(`${msg}\n`))
+	print(chalk.red(msg))
 	process.exist(1)
+}
+
+function print(msg) {
+	process.stdout.write(`${msg}\n`)
 }
