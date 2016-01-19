@@ -20,6 +20,7 @@ let settings
 program
 	.option('-o, --overwrite', 'regenerate the full changelog. OVERWRITES the current changelog')
 	.option('-i, --interactive', 'request username / password if not provided')
+	.option('-v, --verbose', 'verbose output')
 	.parse(process.argv)
 
 co(function *() {
@@ -35,6 +36,7 @@ function *getSettings(program) {
 	const repoInfo = getRepoInfo()
 	const pkgInfo = getPackageInfo()
 	const settings = Object.assign({}, repoInfo, pkgInfo)
+	settings.verbose = !!program.verbose
 
 	const user = settings.username = process.env.BITBUCKET_USER
 	if (!user && program.interactive) settings.username = yield prompt('username: ')
@@ -137,6 +139,8 @@ function getCommit(hash) {
 }
 
 function serviceCall(url) {
+	if (settings.verbose) process.stdout.write(`${url}\n`)
+
 	return request({
 		url,
 		headers: {
@@ -291,7 +295,7 @@ function complete() {
 
 function error(e) {
 	let msg
-	if (e.status) msg = `${e.status}: ${e.statusText} - ${e.data}`
+	if (e.status) msg = `${e.status}: ${e.statusText} - ${JSON.stringify(e.data)}`
 	else if (e.message) msg = e.message
 	else msg = e
 
