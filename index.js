@@ -44,19 +44,20 @@ function *getSettings(program) {
 	const pswd = settings.password = process.env.BITBUCKET_PSWD
 	if (!pswd && program.interactive) settings.password = yield prompt.password('password: ')
 
-	if (!settings.slug) settings.slug = path.basename(process.cwd())
 	if (!settings.basePath) settings.basePath = '/rest/api/1.0/projects'
 
 	settings.overwrite = !!program.overwrite
 	settings.file = settings.file ? path.resolve(settings.file) : path.resolve(DEFAULT_FILE)
-	settings.baseUrl = `${settings.bitbucket}${settings.basePath}/${settings.projectKey}/repos/${settings.slug}`
+	settings.baseUrl = `${settings.bitbucket}${settings.basePath}/${settings.projectKey}/repos/${settings.repositoryKey}`
 	settings.fileContents = read(settings.file)
 
 	verifySettings(settings)
 
 	if (settings.verbose) {
+		const copy = Object.assign({}, settings)
+		delete copy.fileContents
 		print('Settings:')
-		print(JSON.stringify(settings, null, 2))
+		print(JSON.stringify(copy, null, 2))
 	}
 
 	return settings
@@ -67,6 +68,8 @@ function verifySettings(settings) {
 	assert.ok(settings.username, 'Please define username via `BITBUCKET_USER` env variable, or run in interactive mode.')
 	assert.ok(settings.password, 'Please define password via `BITBUCKET_PSWD` env variable, or run in interactive mode.')
 	assert.ok(settings.bitbucket, 'Please define your bitbucket base url in package.json. See README for more info.')
+	assert.ok(settings.projectKey, 'Please define your bitbucket projectKey in package.json. See README for more info.')
+	assert.ok(settings.repositoryKey, 'Please define your bitbucket repositoryKey in package.json. See README for more info.')
 
 	if (!settings.overwrite) {
 		const releaseTitle = renderReleaseTitle({ version: settings.version })
@@ -85,9 +88,9 @@ function getRepoInfo() {
 		const i = host.lastIndexOf(':')
 		if (i != -1) host = host.substr(0, i)
 		const parts = url.path().split('/')
-		const slug = path.basename(parts.pop(), '.git')
-		const key = parts.pop()
-		return { bitbucket: `https://${host}`, projectKey: key, slug }
+		const repositoryKey = path.basename(parts.pop(), '.git')
+		const projectKey = parts.pop()
+		return { bitbucket: `https://${host}`, projectKey, repositoryKey }
 	}
 	catch(e) {
 		// Failed to get details from git repo so we'll have to rely on package.json config
@@ -98,7 +101,7 @@ function getRepoInfo() {
 function getPackageInfo() {
 	try {
 		const pkg = require(path.resolve('./package.json'))
-		return Object.assign({ version: pkg.version }, pkg.changelog)
+		return Object.assign({ version: pkg.version, name: pkg.name }, pkg.changelog)
 	}
 	catch(e) {
 		return {}
