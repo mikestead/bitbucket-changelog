@@ -170,7 +170,7 @@ function *buildReleases() {
 	const childPrs = yield childPrPromises
 	prs.forEach((pr, i) => pr.children = childPrs[i])
 
-	let release = { version: settings.version, prs: [], date: Date.now()}
+	let release = { version: settings.version, prs: [], date: Date.now() }
 	let lastTag = tags.shift()
 	const releases = []
 	while (prs.length) {
