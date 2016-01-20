@@ -26,7 +26,7 @@ but _before_ you tag your release.
 The `package.json` will be read for the version to associate merged pull requests
 since the last release.
 
-You should also add some some configuration to your `package.json` as shown below.
+You should also add some configuration to your `package.json` as shown below.
 
 ##### Example package.json
 
