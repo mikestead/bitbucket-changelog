@@ -56,6 +56,7 @@ function *getSettings(program) {
 	if (settings.verbose) {
 		const copy = Object.assign({}, settings)
 		delete copy.fileContents
+		delete copy.password
 		print('Settings:')
 		print(JSON.stringify(copy, null, 2))
 	}
@@ -171,7 +172,7 @@ function *buildReleases() {
 	const tagCommits = yield tagCommitPromises
 	tags.forEach((tag, i) => tag.commit = tagCommits[i])
 
-	const since = settings.overwrite ? null : tags[0].commit.authorTimestamp
+	const since = (settings.overwrite || !tags.length) ? null : tags[0].commit.authorTimestamp
 	const prs = yield getPullRequests('master', 'MERGED', since, 0, 50)
 
 	const childPrPromises = prs.map(pr => getPullRequests(pr.fromRef.displayId, 'MERGED', null, 0, 25))
