@@ -37,7 +37,7 @@ You should also add some configuration to your `package.json` as shown below.
             "jira": "https://<your-jira-host>",
             "bitbucket": "https://<your-bitbucket-host>",
             "projectKey": "<bitbucket-project-key>",
-            "repositoryKey": "<bitbucket-repository-key>",
+            "repositoryKey": "<bitbucket-repository-key>"
         }
     }
 
