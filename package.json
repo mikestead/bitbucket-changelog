@@ -36,7 +36,7 @@
     "bbgenlog": "index.js"
   },
   "dependencies": {
-    "axios": "^0.8.1",
+    "axios": "^0.15.3",
     "chalk": "^1.1.1",
     "co": "^4.6.0",
     "co-prompt": "^1.0.0",
@@ -45,10 +45,10 @@
     "moment": "^2.11.1"
   },
   "devDependencies": {
-    "eslint": "^1.10.3",
+    "eslint": "^3.14.0",
     "eslint-config-rackt": "^1.1.1",
     "expect": "^1.13.0",
     "express": "^4.13.3",
-    "mocha": "^2.3.4"
+    "mocha": "^3.2.0"
   }
 }
