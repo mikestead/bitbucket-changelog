@@ -1,5 +1,7 @@
 # Bitbucket Changelog
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/mikestead/bitbucket-changelog.svg)](https://greenkeeper.io/)
+
 Maintain a changelog of merged pull requests to master branch since 
 the last release. Can be integrated into your automated release cycle.
 
