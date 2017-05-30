@@ -309,7 +309,7 @@ function error(e) {
 	else msg = e
 
 	print(chalk.red(msg))
-	process.exist(1)
+	process.exit(1)
 }
 
 function print(msg) {
