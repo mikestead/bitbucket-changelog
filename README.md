@@ -59,9 +59,10 @@ For help
     bbgenlog --help
 
     > Usage: bbgenlog [options]
-	> 
+    > 
     > Options:
-	> 
-    >   -h, --help         output usage information
-    >   -o, --overwrite    regenerate the full changelog. OVERWRITES the current changelog
-    >   -i, --interactive  request username / password if not provided
+    > 
+    >   -h, --help           output usage information
+    >   -o, --overwrite      regenerate the full changelog. OVERWRITES the current changelog
+    >   -b, --branch [name]  base branch to look for merged pull requests (default: master)
+    >   -i, --interactive    request username / password if not provided
