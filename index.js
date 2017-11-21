@@ -20,6 +20,7 @@ let settings
 program
 	.option('-o, --overwrite', 'regenerate the full changelog. OVERWRITES the current changelog')
 	.option('-i, --interactive', 'request username / password if not provided')
+	.option('-b, --branch [name]', 'base branch to look for merged pull requests (default: master)')
 	.option('-v, --verbose', 'verbose output')
 	.parse(process.argv)
 
@@ -47,6 +48,7 @@ function *getSettings(program) {
 	if (!settings.basePath) settings.basePath = '/rest/api/1.0/projects'
 
 	settings.overwrite = !!program.overwrite
+	settings.branch = program.branch || 'master'
 	settings.file = settings.file ? path.resolve(settings.file) : path.resolve(DEFAULT_FILE)
 	settings.baseUrl = `${settings.bitbucket}${settings.basePath}/${settings.projectKey}/repos/${settings.repositoryKey}`
 	settings.fileContents = read(settings.file)
@@ -71,6 +73,7 @@ function verifySettings(settings) {
 	assert.ok(settings.bitbucket, 'Please define your bitbucket base url in package.json. See README for more info.')
 	assert.ok(settings.projectKey, 'Please define your bitbucket projectKey in package.json. See README for more info.')
 	assert.ok(settings.repositoryKey, 'Please define your bitbucket repositoryKey in package.json. See README for more info.')
+	assert.ok(typeof settings.branch === 'string', 'Please specify a branch name when using the -b option.See README for more info.')
 
 	if (!settings.overwrite) {
 		const releaseTitle = renderReleaseTitle({ version: settings.version })
@@ -173,7 +176,7 @@ function *buildReleases() {
 	tags.forEach((tag, i) => tag.commit = tagCommits[i])
 
 	const since = (settings.overwrite || !tags.length) ? null : tags[0].commit.authorTimestamp
-	const prs = yield getPullRequests('master', 'MERGED', since, 0, 50)
+	const prs = yield getPullRequests(settings.branch, 'MERGED', since, 0, 50)
 
 	const childPrPromises = prs.map(pr => getPullRequests(pr.fromRef.displayId, 'MERGED', null, 0, 25))
 	const childPrs = yield childPrPromises
