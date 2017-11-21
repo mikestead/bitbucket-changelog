@@ -13,7 +13,7 @@ const chalk = require('chalk')
 const assert = require('assert')
 
 const DEFAULT_FILE = 'CHANGES.md'
-const JIRA_REGEX = /(?:)([A-Z]{1,}-[0-9]+)(?=\s|_|\/|$)/g
+const JIRA_REGEX = /(?:)([A-Z0-9]{1,}-[0-9]+)(?=\s|-|_|\/|$)/g
 
 let settings
 
